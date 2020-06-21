@@ -7,7 +7,6 @@ class MoviesService {
   }
 
   async getMovies({ tags }) {
-    console.log(`GET MOVIES`);
     const query = tags && { tags: { $in: tags } };
     const movies = await this.mongoDB.getAll(this.collection, query);
     return movies || [];
