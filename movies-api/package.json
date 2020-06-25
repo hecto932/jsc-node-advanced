@@ -4,11 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "DEBUG=app:8 nodemon index",
+    "dev": "DEBUG=express:*,app:* nodemon index",
+    "debug": "DEBUG=express:*,app:* npm run start",
     "start": "NODE_ENV=production node index",
     "test": "mocha --exit",
     "cover": "nyc npm run test",
-    "report": "nyc report --reporter=html && open coverage/index.html"
+    "report": "nyc report --reporter=html && open coverage/index.html",
+    "inspect": "DEBUG=express:*,app:* nodemon --inspect index"
   },
   "keywords": [],
   "author": "",
