@@ -10,7 +10,10 @@
     "test": "mocha --exit",
     "cover": "nyc npm run test",
     "report": "nyc report --reporter=html && open coverage/index.html",
-    "inspect": "DEBUG=express:*,app:* nodemon --inspect index"
+    "inspect": "DEBUG=express:*,app:* nodemon --inspect index",
+    "seed-movies": "DEBUG=app:* node scripts/mongo/seedMovies.js",
+    "seed-users": "DEBUG=app:* node scripts/mongo/seedUsers.js",
+    "seed-api-keys": "DEBUG=app:* node scripts/mongo/seedApiKeys.js"
   },
   "keywords": [],
   "author": "",
@@ -21,9 +24,14 @@
     "bcrypt": "^5.0.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "mongodb": "^3.5.9"
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.5.9",
+    "passport": "^0.4.1",
+    "passport-http": "^0.3.0",
+    "passport-jwt": "^4.0.0"
   },
   "devDependencies": {
+    "chalk": "^4.1.0",
     "eslint": "^7.2.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
