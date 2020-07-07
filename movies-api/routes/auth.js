@@ -6,10 +6,14 @@ const ApiKeysService = require('../services/apiKeys');
 const UsersService = require('../services/users');
 const validationHandler = require('../utils/middleware/validationHandler');
 
-const { createUserSchema } = require('../utils/schemas/users');
+const {
+  createUserSchema,
+  createProviderUserSchema,
+} = require('../utils/schemas/users');
+
 const { config } = require('../config');
 
-// Basic Strategy
+// Basic strategy
 require('../utils/auth/strategies/basic');
 
 function authApi(app) {
@@ -26,18 +30,18 @@ function authApi(app) {
       next(boom.unauthorized('apiKeyToken is required'));
     }
 
-    passport.authenticate('basic', function (err, user) {
+    passport.authenticate('basic', function (error, user) {
       try {
-        if (err || !user) {
+        if (error || !user) {
           next(boom.unauthorized());
         }
 
-        req.login(user, { session: false }, async function (err) {
-          if (err) {
-            next(err);
+        req.login(user, { session: false }, async function (error) {
+          if (error) {
+            next(error);
           }
 
-          const apiKey = await apiKeysService.getApikey({ token: apiKeyToken });
+          const apiKey = await apiKeysService.getApiKey({ token: apiKeyToken });
 
           if (!apiKey) {
             next(boom.unauthorized());
@@ -49,7 +53,7 @@ function authApi(app) {
             sub: id,
             name,
             email,
-            scropes: apiKey.scopes,
+            scopes: apiKey.scopes,
           };
 
           const token = jwt.sign(payload, config.authJwtSecret, {
@@ -58,8 +62,8 @@ function authApi(app) {
 
           return res.status(200).json({ token, user: { id, name, email } });
         });
-      } catch (err) {
-        next(err);
+      } catch (error) {
+        next(error);
       }
     })(req, res, next);
   });
@@ -70,6 +74,7 @@ function authApi(app) {
     next
   ) {
     const { body: user } = req;
+
     try {
       const createdUserId = await usersService.createUser({ user });
 
@@ -77,10 +82,50 @@ function authApi(app) {
         data: createdUserId,
         message: 'user created',
       });
-    } catch (err) {
-      next(err);
+    } catch (error) {
+      next(error);
     }
   });
+
+  router.post(
+    '/sign-provider',
+    validationHandler(createProviderUserSchema),
+    async function (req, res, next) {
+      const { body } = req;
+
+      const { apiKeyToken, ...user } = body;
+
+      if (!apiKeyToken) {
+        next(boom.unauthorized('apiKeyToken is required'));
+      }
+
+      try {
+        const queriedUser = await usersService.getOrCreateUser({ user });
+        const apiKey = await apiKeysService.getApiKey({ token: apiKeyToken });
+
+        if (!apiKey) {
+          next(boom.unauthorized());
+        }
+
+        const { _id: id, name, email } = queriedUser;
+
+        const payload = {
+          sub: id,
+          name,
+          email,
+          scopes: apiKey.scopes,
+        };
+
+        const token = jwt.sign(payload, config.authJwtSecret, {
+          expiresIn: '15m',
+        });
+
+        return res.status(200).json({ token, user: { id, name, email } });
+      } catch (error) {
+        next(error);
+      }
+    }
+  );
 }
 
 module.exports = authApi;
