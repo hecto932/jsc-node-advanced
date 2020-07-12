@@ -4,6 +4,7 @@ const boom = require('@hapi/boom');
 const cookieParser = require('cookie-parser');
 
 const { config } = require('./config');
+const { THIRTY_DAYS_IN_SEC, TWO_HOURS_IN_SEC } = require('./utils/time.js');
 
 const app = express();
 
@@ -15,6 +16,8 @@ app.use(cookieParser());
 require('./utils/auth/strategies/basic');
 
 app.post('/auth/sign-in', async function (req, res, next) {
+  const { rememberMe } = req.body;
+
   passport.authenticate('basic', function (err, data) {
     try {
       if (error || !data) {
@@ -25,10 +28,11 @@ app.post('/auth/sign-in', async function (req, res, next) {
         if (err) {
           next(err);
         }
-        const { user, token } = data;
+        const { token, ...user } = data;
         res.cookie('token', token, {
           httpOnly: !config.dev,
           secure: !config.dev,
+          maxAge: rememberMe ? THIRTY_DAYS_IN_SEC : TWO_HOURS_IN_SEC,
         });
 
         res.status(200).json(user);
@@ -36,7 +40,7 @@ app.post('/auth/sign-in', async function (req, res, next) {
     } catch (err) {
       next(err);
     }
-  });
+  })(req, res, next);
 });
 
 app.post('/auth/sign-up', async function (req, res, next) {
