@@ -21,19 +21,20 @@ function userMoviesApi(app) {
   router.get(
     '/',
     passport.authenticate('jwt', { session: false }),
-    scopesValidationHandler(['read:movies']),
+    scopesValidationHandler(['read:user-movies']),
     validationHandler({ userId: userIdSchema }, 'query'),
     async function (req, res, next) {
       const { userId } = req.query;
 
       try {
         const userMovies = await userMoviesService.getUserMovies({ userId });
+
         res.status(200).json({
           data: userMovies,
           message: 'user movies listed',
         });
-      } catch (err) {
-        next(err);
+      } catch (error) {
+        next(error);
       }
     }
   );
@@ -47,9 +48,9 @@ function userMoviesApi(app) {
       const { body: userMovie } = req;
 
       try {
-        const createdUserMovieId = await userMoviesService.createUserMovie(
-          userMovie
-        );
+        const createdUserMovieId = await userMoviesService.createUserMovie({
+          userMovie,
+        });
 
         res.status(201).json({
           data: createdUserMovieId,
@@ -78,8 +79,8 @@ function userMoviesApi(app) {
           data: deletedUserMovieId,
           message: 'user movie deleted',
         });
-      } catch (err) {
-        next(err);
+      } catch (error) {
+        next(error);
       }
     }
   );
