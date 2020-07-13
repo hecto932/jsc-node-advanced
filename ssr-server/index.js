@@ -18,9 +18,7 @@ app.use(cookieParser());
 
 //  Basic strategy
 require('./utils/auth/strategies/basic');
-
-// OAuth strategy
-// require('./utils/auth/strategies/oauth');
+require('./utils/auth/strategies/oauth');
 
 // Twitter strategy
 // require('./utils/auth/strategies/twitter');
@@ -113,31 +111,31 @@ app.delete('/user-movies/:userMovieId', async function (req, res, next) {
   }
 });
 
-// app.get(
-//   '/auth/google-oauth',
-//   passport.authenticate('google-oauth', {
-//     scope: ['email', 'profile', 'openid'],
-//   })
-// );
+app.get(
+  '/auth/google-oauth',
+  passport.authenticate('google-oauth', {
+    scope: ['email', 'profile', 'openid'],
+  })
+);
 
-// app.get(
-//   '/auth/google-oauth/callback',
-//   passport.authenticate('google-oauth', { session: false }),
-//   function (req, res, next) {
-//     if (!req.user) {
-//       next(boom.unauthorized());
-//     }
+app.get(
+  '/auth/google-oauth/callback',
+  passport.authenticate('google-oauth', { session: false }),
+  function (req, res, next) {
+    if (!req.user) {
+      next(boom.unauthorized());
+    }
 
-//     const { token, ...user } = req.user;
+    const { token, ...user } = req.user;
 
-//     res.cookie('token', token, {
-//       httpOnly: !config.dev,
-//       secure: !config.dev,
-//     });
+    res.cookie('token', token, {
+      httpOnly: !config.dev,
+      secure: !config.dev,
+    });
 
-//     res.status(200).json(user);
-//   }
-// );
+    res.status(200).json(user);
+  }
+);
 
 // app.get('/auth/twitter', passport.authenticate('twitter'));
 

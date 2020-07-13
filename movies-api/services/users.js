@@ -23,6 +23,17 @@ class UsersServices {
     });
     return createdUserId;
   }
+
+  async getOrCreateUser({ user }) {
+    const queryUser = await this.getUsers({ email: user.email });
+
+    if (queryUser) {
+      return queryUser;
+    }
+
+    await this.createUser({ user });
+    return await this.getUsers({ email: user.email });
+  }
 }
 
 module.exports = UsersServices;
