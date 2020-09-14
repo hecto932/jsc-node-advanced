@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "index.js",
+      "use": "@now/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.js",
+      "methods": ["POST", "GET", "PUT", "DELETE"],
+      "headers": {
+        "Access-Control-Allow-Origin": "_",
+        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept",
+        "Access-Control-Allow-Credentials": "true"
+      }
+    }
+  ],
+  "env": {
+    "API_URL": "@platzivideo-ssr-api-url",
+    "API_KEY_TOKEN": "@platzivideo-ssr-api-key-token",
+    "GOOGLE_CLIENT_ID": "@platzivideo-ssr-google-client-id",
+    "GOOGLE_CLIENT_SECRET": "@platzivideo-ssr-goolgle-client-secret",
+    "SESSION_SECRET": "@platzivideo-ssr-session-secret",
+    "TWITTER_CONSUMER_KEY": "@platzivideo-ssr-twitter-consumer-key",
+    "TWITTER_CONSUMER_SECRET": "@platzivideo-ssr-twitter-consumer-secret"
+  }
+}
